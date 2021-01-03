@@ -11,8 +11,8 @@ export default async (req, res) => {
   console.log(tipstring,algo)
   const python = spawn('python', ['./pages/api/mail.py', tipstring, algo])
   python.stdout.on('data', data=>{
-    console.log(data)
     string=data.toString()
+    console.log(string)
     res.statusCode = 200
     res.json({ name: string })
   })

@@ -46,7 +46,7 @@ if(datasets[sys.argv[1]]==1):
     
         wordfrequency={}
         
-        # nltk.download('punkt')
+        nltk.download('punkt')
         for text in data['message']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -88,7 +88,7 @@ if(datasets[sys.argv[1]]==3):
     
         wordfrequency={}
         
-        # nltk.download('punkt')
+        nltk.download('punkt')
         for text in data['text']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -135,7 +135,7 @@ if(datasets[sys.argv[1]]==2):
     
         wordfrequency={}
         
-        # nltk.download('punkt')
+        nltk.download('punkt')
         for text in data['v2']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -186,7 +186,7 @@ if(datasets[sys.argv[1]]==4):
     
         wordfrequency={}
         
-        # nltk.download('punkt')
+        nltk.download('punkt')
         for text in data['Column2']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
