@@ -9,12 +9,13 @@ export default async (req, res) => {
   let string
   const tipstring='./pages/api/'+tip+'.csv'
   console.log(tipstring,algo)
-  const python = spawn('python', ['./pages/api/sa.py', tipstring, algo])
+  const python = spawn('python', ['./pages/api/mail.py', tipstring, algo])
   python.stdout.on('data', data=>{
     console.log(data)
     string=data.toString()
     res.statusCode = 200
-    res.json({ name: JSON.parse(string).name })
+    res.json({ name: string })
   })
   
 }
+//name: JSON.parse(string).name 
