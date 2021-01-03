@@ -9,7 +9,7 @@ export default function Home() {
   const [out,setOut] = useState("")
   
   const connect = () =>{
-    fetch("http://localhost:3000/api/hello",{
+    fetch("https://spam-mail-project.herokuapp.com/api/hello",{
       method: 'POST',
         headers:{'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
