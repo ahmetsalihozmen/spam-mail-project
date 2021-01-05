@@ -18,13 +18,16 @@ from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import NearestNeighbors
-# import keras
-# from keras.models import Sequential
-# from keras.layers import Dense
-# from keras.utils import to_categorical 
+from sklearn.metrics import f1_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.utils import to_categorical 
 import os
+import json
 import sys
-
 
 
 
@@ -46,7 +49,7 @@ if(datasets[sys.argv[1]]==1):
     
         wordfrequency={}
         
-        nltk.download('punkt')
+        # nltk.download('punkt')
         for text in data['message']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -88,7 +91,7 @@ if(datasets[sys.argv[1]]==3):
     
         wordfrequency={}
         
-        nltk.download('punkt')
+        # nltk.download('punkt')
         for text in data['text']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -135,7 +138,7 @@ if(datasets[sys.argv[1]]==2):
     
         wordfrequency={}
         
-        nltk.download('punkt')
+        # nltk.download('punkt')
         for text in data['v2']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -186,7 +189,7 @@ if(datasets[sys.argv[1]]==4):
     
         wordfrequency={}
         
-        nltk.download('punkt')
+        # nltk.download('punkt')
         for text in data['Column2']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
@@ -235,27 +238,72 @@ if(datasets_model[sys.argv[2]]==1):
     y_pred = classifier.predict(X_test)
     
     # Making the Confusion Matrix
-    print("Confussion Matrix for Multinomial Naive Bayes:")
-    print(confusion_matrix(y_test, y_pred))
-
-    
-    print("Accuracy Score for Multinomial Naive Bayes:" )
-    print(accuracy_score(y_test, y_pred))
-
-    
-    
+   
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
     accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    print("Mean for Multinomial Naive Bayes:")
-    print(accuracies.mean())
-    print("Standard Deviation for Multinomial Naive Bayes:" )
-    print(accuracies.std())
+    x={"TN":int(tn),"FP":int(fp),"FN":int(fn),"TP":int(tp)}
+
+    x['Acc']=float(accuracy_score(y_test, y_pred))
+    x['Mean']=float(accuracies.mean())
+    x['STDV']=float(accuracies.std())
+    a=f1_score(y_test,y_pred,labels=[0,1],average=None)
+    a1=a[0]
+    a2=a[1]
+    b=recall_score(y_test,y_pred,labels=[0,1],average=None)
+    b1=b[0]
+    b2=b[1]
+    c=precision_score(y_test,y_pred,labels=[0,1],average=None)
+    c1=c[0]
+    c2=c[1]
+    x['RCS0']=b1
+    x['RCS1']=b2
+    x['PCS0']=c1
+    x['PCS0']=c2
+    x['F1S0']=a1
+    x['F1S1']=a2
+     
+    if(sys.argv[3]==""):
+         x['res_data']=""
+    else:
+        test=X_train[int(sys.argv[3])].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        if(sonuc==1):
+           
+             x['res_data']="Spam"
+              
+        else:
+            
+             x['res_data']="Spam"
+ 
     
-    
-    print("Classification report for Multinomial Naive Bayes")
-    print(classification_report(y_test,y_pred,[0, 1]))
-
-
-
+    if(sys.argv[4]==""):
+        x['res_string']=""
+    else:
+        text=sys.argv[4]
+        sentence_vectors_test = []
+           
+        sentence_tokens_test = nltk.word_tokenize(text)
+        sent_vec_test = []
+        for token in most_frequency:
+            
+            if token in sentence_tokens_test:
+                sent_vec_test.append(1)
+            else:
+                sent_vec_test.append(0)
+        sentence_vectors_test.append(sent_vec_test)
+                
+        sentence_vectors_test = np.asarray(sentence_vectors_test)
+        test=sentence_vectors_test[0].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        
+        if(sonuc==1):
+            x['res_string']="Spam"
+        else:
+            x['res_string']="Spam degil"
+    y=json.dumps(x)
+    print(y)
 
 
 
@@ -271,25 +319,72 @@ if(datasets_model[sys.argv[2]]==2):
     # Predicting the Test set results
     y_pred = classifier.predict(X_test)
     
-    # Making the Confusion Matrix
-    print("Confussion Matrix for Support Vector Machine:")
-    print(confusion_matrix(y_test, y_pred))
-
-    
-    print("Accuracy Score for Support Vector Machine:" )
-    print(accuracy_score(y_test, y_pred))
-
-    
-    
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
     accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    print("Mean for Multinomial Naive Bayes:")
-    print(accuracies.mean())
-    print("Standard Deviation for Support Vector Machine:" )
-    print(accuracies.std())
+    x={"TN":int(tn),"FP":int(fp),"FN":int(fn),"TP":int(tp)}
+
+    x['Acc']=float(accuracy_score(y_test, y_pred))
+    x['Mean']=float(accuracies.mean())
+    x['STDV']=float(accuracies.std())
+    a=f1_score(y_test,y_pred,labels=[0,1],average=None)
+    a1=a[0]
+    a2=a[1]
+    b=recall_score(y_test,y_pred,labels=[0,1],average=None)
+    b1=b[0]
+    b2=b[1]
+    c=precision_score(y_test,y_pred,labels=[0,1],average=None)
+    c1=c[0]
+    c2=c[1]
+    x['RCS0']=b1
+    x['RCS1']=b2
+    x['PCS0']=c1
+    x['PCS0']=c2
+    x['F1S0']=a1
+    x['F1S1']=a2
+     
+    if(sys.argv[3]==""):
+         x['res_data']=""
+    else:
+        test=X_train[int(sys.argv[3])].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        if(sonuc==1):
+           
+             x['res_data']="Spam"
+              
+        else:
+            
+             x['res_data']="Spam"
+ 
     
-    
-    print("Classification report for Support Vector Machine")
-    print(classification_report(y_test,y_pred,[0, 1]))
+    if(sys.argv[4]==""):
+        x['res_string']=""
+    else:
+        text=sys.argv[4]
+        sentence_vectors_test = []
+           
+        sentence_tokens_test = nltk.word_tokenize(text)
+        sent_vec_test = []
+        for token in most_frequency:
+            
+            if token in sentence_tokens_test:
+                sent_vec_test.append(1)
+            else:
+                sent_vec_test.append(0)
+        sentence_vectors_test.append(sent_vec_test)
+                
+        sentence_vectors_test = np.asarray(sentence_vectors_test)
+        test=sentence_vectors_test[0].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        
+        if(sonuc==1):
+            x['res_string']="Spam"
+        else:
+            x['res_string']="Spam degil"
+    y=json.dumps(x)
+    print(y)
+
 
 
 
@@ -306,25 +401,75 @@ if(datasets_model[sys.argv[2]]==3):
     # Predicting the Test set results
     y_pred = classifier.predict(X_test)
     
-    # Making the Confusion Matrix
-    print("Confussion Matrix for Random Forest:")
-    print(confusion_matrix(y_test, y_pred))
-
-    
-    print("Accuracy Score for Random Forest:" )
-    print(accuracy_score(y_test, y_pred))
-
-    
-    
+     
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
     accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    print("Mean for Random Forest:")
-    print(accuracies.mean())
-    print("Standard Deviation for Random Forest:" )
-    print(accuracies.std())
+    x={"TN":int(tn),"FP":int(fp),"FN":int(fn),"TP":int(tp)}
+
+    x['Acc']=float(accuracy_score(y_test, y_pred))
+    x['Mean']=float(accuracies.mean())
+    x['STDV']=float(accuracies.std())
+    a=f1_score(y_test,y_pred,labels=[0,1],average=None)
+    a1=a[0]
+    a2=a[1]
+    b=recall_score(y_test,y_pred,labels=[0,1],average=None)
+    b1=b[0]
+    b2=b[1]
+    c=precision_score(y_test,y_pred,labels=[0,1],average=None)
+    c1=c[0]
+    c2=c[1]
+    x['RCS0']=b1
+    x['RCS1']=b2
+    x['PCS0']=c1
+    x['PCS0']=c2
+    x['F1S0']=a1
+    x['F1S1']=a2
+     
+    if(sys.argv[3]==""):
+         x['res_data']=""
+    else:
+        test=X_train[int(sys.argv[3])].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        if(sonuc==1):
+           
+             x['res_data']="Spam"
+              
+        else:
+            
+             x['res_data']="Spam"
+ 
     
-    
-    print("Classification report for Random Forest")
-    print(classification_report(y_test,y_pred,[0, 1]))
+    if(sys.argv[4]==""):
+        x['res_string']=""
+    else:
+        text=sys.argv[4]
+        sentence_vectors_test = []
+           
+        sentence_tokens_test = nltk.word_tokenize(text)
+        sent_vec_test = []
+        for token in most_frequency:
+            
+            if token in sentence_tokens_test:
+                sent_vec_test.append(1)
+            else:
+                sent_vec_test.append(0)
+        sentence_vectors_test.append(sent_vec_test)
+                
+        sentence_vectors_test = np.asarray(sentence_vectors_test)
+        test=sentence_vectors_test[0].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        
+        if(sonuc==1):
+            x['res_string']="Spam"
+        else:
+            x['res_string']="Spam degil"
+    y=json.dumps(x)
+    print(y)
+
+
+
 
 
 
@@ -340,48 +485,166 @@ if(datasets_model[sys.argv[2]]==4):
     # Predicting the Test set results
     y_pred = classifier.predict(X_test)
     
-    # Making the Confusion Matrix
-    print("Confussion Matrix for K-Neighbors:")
-    print(confusion_matrix(y_test, y_pred))
-
-    
-    print("Accuracy Score for K-Neighbors:" )
-    print(accuracy_score(y_test, y_pred))
-
-    
-    
+     
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
     accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    print("Mean for K-Neighbors:")
-    print(accuracies.mean())
-    print("Standard Deviation for K-Neighbors:" )
-    print(accuracies.std())
-    
-    
-    print("Classification report for K-Neighbors")
-    print(classification_report(y_test,y_pred,[0, 1]))
+    x={"TN":int(tn),"FP":int(fp),"FN":int(fn),"TP":int(tp)}
 
-
-
-
-# if(datasets_model[sys.argv[2]]==5):
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20)
-    
-    
-    
-#     model = Sequential()
-#     model.add(Dense(500, activation='relu', input_dim=1000))
-#     model.add(Dense(100, activation='relu'))
-#     model.add(Dense(50, activation='relu'))
-#     model.add(Dense(1, activation='sigmoid'))
-#     model.compile(optimizer='adam', 
-#               loss='binary_crossentropy', 
-#               metrics=['accuracy'])
-#     history =model.fit(X_train, y_train, epochs=20,validation_data=(X_test,y_test))
-#     # Predicting the Test set results
-#     y_pred = model.predict(X_test)
-#     scores = model.evaluate(X_train, y_train, verbose=1)
-#     print('Accuracy on test data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))   
+    x['Acc']=float(accuracy_score(y_test, y_pred))
+    x['Mean']=float(accuracies.mean())
+    x['STDV']=float(accuracies.std())
+    a=f1_score(y_test,y_pred,labels=[0,1],average=None)
+    a1=a[0]
+    a2=a[1]
+    b=recall_score(y_test,y_pred,labels=[0,1],average=None)
+    b1=b[0]
+    b2=b[1]
+    c=precision_score(y_test,y_pred,labels=[0,1],average=None)
+    c1=c[0]
+    c2=c[1]
+    x['RCS0']=b1
+    x['RCS1']=b2
+    x['PCS0']=c1
+    x['PCS0']=c2
+    x['F1S0']=a1
+    x['F1S1']=a2
+     
+    if(sys.argv[3]==""):
+         x['res_data']=""
+    else:
+        test=X_train[int(sys.argv[3])].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        if(sonuc==1):
+           
+             x['res_data']="Spam"
+              
+        else:
+            
+             x['res_data']="Spam"
  
+    
+    if(sys.argv[4]==""):
+        x['res_string']=""
+    else:
+        text=sys.argv[4]
+        sentence_vectors_test = []
+           
+        sentence_tokens_test = nltk.word_tokenize(text)
+        sent_vec_test = []
+        for token in most_frequency:
+            
+            if token in sentence_tokens_test:
+                sent_vec_test.append(1)
+            else:
+                sent_vec_test.append(0)
+        sentence_vectors_test.append(sent_vec_test)
+                
+        sentence_vectors_test = np.asarray(sentence_vectors_test)
+        test=sentence_vectors_test[0].reshape(1,-1)
+        sonuc=classifier.predict(test)
+        sonuc=int(np.around(sonuc))
+        
+        if(sonuc==1):
+            x['res_string']="Spam"
+        else:
+            x['res_string']="Spam degil"
+    y=json.dumps(x)
+    print(y)
+
+
+
+
+
+
+
+if(datasets_model[sys.argv[2]]==5):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20)
+    
+    
+    
+    model = Sequential()
+    model.add(Dense(500, activation='relu', input_dim=1000))
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer='adam', 
+              loss='binary_crossentropy', 
+              metrics=['accuracy'])
+    history =model.fit(X_train, y_train, epochs=3,validation_data=(X_test,y_test),verbose=0)
+    # Predicting the Test set results
+    y_pred = model.predict(X_test)
+    scores = model.evaluate(X_train, y_train, verbose=0)
+    y_pred=np.around(y_pred)
+      
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+    # accuracies = cross_val_score(estimator = model, X = X_train, y = y_train, cv = 10,scoring="accuracy")
+    x={"TN":int(tn),"FP":int(fp),"FN":int(fn),"TP":int(tp)}
+
+    x['Acc']=float(accuracy_score(y_test, y_pred))
+    x['Mean']=""
+    x['STDV']=""
+    a=f1_score(y_test,y_pred,labels=[0,1],average=None)
+    a1=a[0]
+    a2=a[1]
+    b=recall_score(y_test,y_pred,labels=[0,1],average=None)
+    b1=b[0]
+    b2=b[1]
+    c=precision_score(y_test,y_pred,labels=[0,1],average=None)
+    c1=c[0]
+    c2=c[1]
+    x['RCS0']=b1
+    x['RCS1']=b2
+    x['PCS0']=c1
+    x['PCS0']=c2
+    x['F1S0']=a1
+    x['F1S1']=a2
+   
+     
+   
+ 
+    if(sys.argv[3]==""):
+         x['res_data']=""
+    else:
+        test=X_train[int(sys.argv[3])].reshape(1,-1)
+        sonuc=model.predict(test)
+        sonuc=int(np.around(sonuc))
+        if(sonuc==1):
+           
+             x['res_data']="Spam"
+              
+        else:
+            
+             x['res_data']="Spam"
+ 
+    
+    if(sys.argv[4]==""):
+        x['res_string']=""
+    else:
+        text=sys.argv[4]
+        sentence_vectors_test = []
+           
+        sentence_tokens_test = nltk.word_tokenize(text)
+        sent_vec_test = []
+        for token in most_frequency:
+            
+            if token in sentence_tokens_test:
+                sent_vec_test.append(1)
+            else:
+                sent_vec_test.append(0)
+        sentence_vectors_test.append(sent_vec_test)
+                
+        sentence_vectors_test = np.asarray(sentence_vectors_test)
+        test=sentence_vectors_test[0].reshape(1,-1)
+        sonuc=model.predict(test)
+        sonuc=int(np.around(sonuc))
+        
+        if(sonuc==1):
+            x['res_string']="Spam"
+        else:
+            x['res_string']="Spam degil"
+    y=json.dumps(x)
+    print(y)
 
     
     

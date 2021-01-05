@@ -6,9 +6,12 @@ import React, {useState} from 'react'
 export default function Home() {
   const [type,setType] = useState("messages")
   const [algorithm,setAlgo] = useState("MultinomialNB")
+  const [row,setRow] = useState("")
+  const [string,setString] = useState("")
   const [out,setOut] = useState("")
   
   const connect = () =>{
+    console.log(row,string)
     fetch("https://spam-mail-project.herokuapp.com/api/hello",{
       method: 'POST',
         headers:{'Access-Control-Allow-Origin': '*',
@@ -16,16 +19,18 @@ export default function Home() {
         },
         body: JSON.stringify({
           tip:type,
-          algo:algorithm
+          algo:algorithm,
+          row:row,
+          str:string
         })
     })
     .then(response => response.json())
     .then(string =>{
-      setOut(string.name)
+        setOut(JSON.parse(string.json).Acc)
     })
     
   }
-
+  // JSON.parse(string.json).name
   return (
     <div className={styles.container}>
       <Head>
@@ -52,16 +57,44 @@ export default function Home() {
             <option>K-Neighbors</option>
             <option>Deep Learning</option>
           </Form.Control>
+          <input type='text' onChange={(event) =>{
+            setRow(event.target.value)
+          }} placeholder="Row"></input>
+          <input type='text' onChange={(event) =>{
+            setString(event.target.value)
+          }} placeholder="String"></input>
+          <div className='but'>
           <Button onClick={connect} >
-            Çalıştır
+            Run
           </Button>
+          </div>
         </Form.Group>
       </Form>
-      <div>{out}</div>
+      <div className='res'>
+        <div>Matris={out}</div>
+        <div>Accuracy Score:</div>
+        <div>Standard Deviation</div>
+        <div>Recall score for Label 0</div>
+        <div>Recall score for Label 1</div>
+        <div>Precision score for Label 0</div>
+        <div>Precision score for Label 1</div>
+        <div>F1 score for Label 0</div>
+        <div>F1 score for Label 1</div>
+        <div>Result of row:</div>
+        <div>Result of input:</div>
+        </div>
       <div></div>
       <style jsx>
                 {`
+                 .but{
                  text-align:center;
+                }
+
+                 .res{
+                   width:40%;
+                   height:200px;
+                   background-color:red;
+                 }
                 `}
             </style>
     </div>
