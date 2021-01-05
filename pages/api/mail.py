@@ -36,7 +36,7 @@ import sys
 
 
 datasets={'./pages/api/messages.csv':1, './pages/api/spam.csv':2, './pages/api/emails.csv':3, './pages/api/spamlar.csv':4}
-
+nltk.download('punkt')
 if(datasets[sys.argv[1]]==1):
         data=pd.read_csv(sys.argv[1])
    
@@ -49,7 +49,7 @@ if(datasets[sys.argv[1]]==1):
     
         wordfrequency={}
         
-        # nltk.download('punkt')
+         
         for text in data['message']:
             tokens=nltk.word_tokenize(text)
             for token in tokens:
